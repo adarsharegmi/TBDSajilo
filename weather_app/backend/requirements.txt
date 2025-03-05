@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+requests
+fire
+aiohttp
+python-dotenv
+pydantic
+pydantic-settings
