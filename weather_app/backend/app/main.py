@@ -2,10 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import uvicorn
-from api import weather
-from core.config import settings
+from backend.app.api import weather
+from backend.app.core.config import settings
 import os
 import fire
+from backend.app.api import news
 
 
 app = FastAPI(title="Weather App API")
@@ -19,6 +20,7 @@ app.add_middleware(
 )
 
 app.include_router(weather.router, prefix="/api/weather", tags=["weather"])
+app.include_router(news.router, prefix="/api/news", tags=["news"])
 
 frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "../frontend")
 if os.path.exists(frontend_dir):
@@ -32,7 +34,7 @@ def runserver():
     """
     Run the FastAPI server using uvicorn.
     """
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("backend.app.main:app", host="0.0.0.0", port=8000, reload=True)
 
 if __name__ == "__main__":
     fire.Fire({"runserver": runserver})
