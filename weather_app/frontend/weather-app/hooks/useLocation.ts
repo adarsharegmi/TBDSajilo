@@ -29,7 +29,7 @@ export const useLocation = () => {
   const fetchLocationFromCoordinates = async (latitude: number, longitude: number) => {
     try {
       const response = await fetch(
-        `https://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=YOUR_API_KEY`
+        `${process.env.NEXT_PUBLIC_NEWS_API_URL}/location/coordinates?lat=${latitude}&lon=${longitude}`
       );
       
       if (!response.ok) {
@@ -94,7 +94,7 @@ export const useLocation = () => {
     
     try {
       const response = await fetch(
-        `https://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=YOUR_API_KEY`
+        `${process.env.NEXT_PUBLIC_NEWS_API_URL}/location/city/${cityName}`
       );
       
       if (!response.ok) {

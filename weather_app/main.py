@@ -17,10 +17,7 @@ def run_frontend():
 
 if __name__ == "__main__":
     # take args from user if it says activate call source venv/bin/activate
-    if len(sys.argv) > 1 and sys.argv[1] == "backend":
         run_backend()
-    else:
-        run_frontend()
     # run_frontend()
     # run_app()
 

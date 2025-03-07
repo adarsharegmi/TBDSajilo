@@ -131,19 +131,71 @@ def format_news_data(data):
         ]
     }
 
-async def get_news_by_coordinates(lat: float, lon: float, units: str = "metric"):
+async def get_news_by_coordinates(lat: float, lon: float, category: str = "general"):
     """Get news data for specific coordinates."""
     async with aiohttp.ClientSession() as session:
         params = {
             "lat": lat,
             "lon": lon,
             "appid": settings.NEWSAPI_API_KEY,
-            "units": units
+            "category": category
         }
         
-        async with session.get(f"{settings.NEWSAPI_BASE_URL}/coordinates", params=params) as response:
-            if response.status != 200:
-                raise Exception("Failed to fetch news data")
-            data = await response.json()
-            return format_news_data(data)   
+        # find the location by coordinates
+        location_data = await get_location_by_coordinates(lat, lon)
+        city = location_data.get("city", "")
+        country = location_data.get("country", "")
+        params["locationUri"] = f"http://en.wikipedia.org/wiki/{city}"
+        return await get_news_by_city(city)
+        # async with session.get(f"{settings.NEWSAPI_BASE_URL}/coordinates", params=params) as response:
+        #     if response.status != 200:
+        #         raise Exception("Failed to fetch news data")
+        #     data = await response.json()
+        #     return format_news_data(data)   
         
+
+
+async def get_location_by_coordinates(lat: float, lon: float):
+    """Get location data for specific coordinates."""
+    async with aiohttp.ClientSession() as session:
+        params = {
+            "lat": lat,
+            "lon": lon,
+            "format": "json"
+        }
+        async with session.get(f"https://nominatim.openstreetmap.org/reverse?", params=params) as response:
+            if response.status != 200:
+                raise Exception("Failed to fetch location data")
+            data = await response.json()
+            return format_location_data(data)
+
+def format_location_data(data):
+    """Format the location data response."""
+    return {
+        "city": data.get("city", ""),
+        "country": data.get("country", ""),
+        "coordinates": {
+            "latitude": data.get("latitude", 0),
+            "longitude": data.get("longitude", 0)
+        }
+    }
+
+async def get_location_by_city(city: str):
+    """Get location data for a specific city."""
+    async with aiohttp.ClientSession() as session:
+        params = {
+            "q": city,
+            "appid": settings.NEWSAPI_API_KEY
+        }
+        async with session.get(f"{settings.NEWSAPI_BASE_URL}/location/city", params=params) as response:
+            if response.status != 200:
+                raise Exception("Failed to fetch location data")
+            data = await response.json()
+            return format_location_data(data)
+
+def format_location_data(data):
+    """Format the location data response."""
+    return {
+        "city": data.get("city", ""),
+        "country": data.get("country", ""),
+    }

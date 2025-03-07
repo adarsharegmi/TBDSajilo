@@ -41,19 +41,23 @@ export const useNews = (
         
         if (coordinates) {
           url += `/coordinates?lat=${coordinates.latitude}&lon=${coordinates.longitude}`;
+          if (category) { 
+            url += `&category=${category}`;
+          }
         } else if (city) {
           url += `/city/${city}`;
+          if (category) {
+            url += `?category=${category}`;
+          }
         }
-        if (category) {
-          url += `?category=${category}`;
-        }
+        
         const response = await fetch(url);
         const data = await response.json();
         
         await new Promise(resolve => setTimeout(resolve, 800));
         
         setNewsState({
-          articles: data.articles,
+          articles: data.events,
           isLoading: false,
           error: null
         });
